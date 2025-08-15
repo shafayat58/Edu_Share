@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="breadcrumbs">
+  <a href="{{ url_for('dashboard') }}">Home</a>
+  {% for f in breadcrumbs %}
+    &raquo; <a href="{{ url_for('folder_view', folder_id=f.id) }}">{{ f.name }}</a>
+  {% endfor %}
+</div>
+
+<section class="grid two">
+  <div>
+    <h2>Folders</h2>
+    <ul class="list">
+      {% for f in root_folders %}
+        <li>
+          <a href="{{ url_for('folder_view', folder_id=f.id) }}">📁 {{ f.name }}</a>
+        </li>
+      {% else %}
+        <li class="muted">No folders.</li>
+      {% endfor %}
+    </ul>
+    <form action="{{ url_for('folder_create') }}" method="post" class="inline">
+      <input type="text" name="name" placeholder="New folder name" required>
+      {% if current_folder %}
+        <input type="hidden" name="parent_id" value="{{ current_folder.id }}">
+      {% endif %}
+      <button type="submit">+ Create Folder</button>
+    </form>
+  </div>
+
+  <div>
+    <h2>Your Files</h2>
+    <ul class="list">
+      {% for r in resources %}
+        <li>
+          <a href="{{ url_for('resource_detail', resource_id=r.id) }}">📄 {{ r.title }}</a>
+          <span class="muted">({{ r.subject or '—' }})</span>
+          {% if r.avg_rating %}<span class="badge">{{ r.avg_rating }}/10</span>{% endif %}
+        </li>
+      {% else %}
+        <li class="muted">No files yet. Upload below.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<h2>Upload</h2>
+<form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" class="card">
+  <div class="grid two">
+    <label>Title <input name="title" placeholder="e.g., Linear Algebra Notes" required></label>
+    <label>Author <input name="author" placeholder="Author/Creator"></label>
+  </div>
+  <div class="grid two">
+    <label>Subject <input name="subject" placeholder="e.g., Mathematics"></label>
+    <label>Folder
+      <select name="folder_id">
+        <option value="">(none)</option>
+        {% if current_folder %}
+          <option value="{{ current_folder.id }}" selected>{{ current_folder.name }}</option>
+        {% endif %}
+        {% for f in breadcrumbs %}
+          <option value="{{ f.id }}">{{ f.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <label>Description <textarea name="description" rows="3" placeholder="Optional notes..."></textarea></label>
+  <label>File <input type="file" name="file" required></label>
+  <button type="submit">Upload</button>
+</form>
+{% endblock %}
