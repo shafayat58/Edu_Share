@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-3xl font-bold text-white mb-6">Search Results</h1>
+
+<!-- Query Information -->
+<p class="text-gray-400 mb-6">
+  Query: <strong class="text-white">{{ q or '—' }}</strong> |
+  Author: <strong class="text-white">{{ author or '—' }}</strong> |
+  Subject: <strong class="text-white">{{ subject or '—' }}</strong> |
+  Sort: <strong class="text-white">{{ sort or '—' }}</strong>
+</p>
+
+<!-- Results List -->
+<ul class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  {% for r in results %}
+  <li class="bg-gray-800 p-4 rounded-lg shadow-md hover:bg-gray-700">
+    <a href="{{ url_for('resource_detail', resource_id=r.id) }}" class="text-xl text-blue-500 hover:underline">📄 {{
+      r.title }}</a>
+    <span class="text-gray-400"> by {{ r.author or '—' }} | {{ r.subject or '—' }}</span>
+    {% if r.avg_rating %}
+    <span class="ml-2 inline-block bg-yellow-500 text-black px-2 py-1 rounded-full text-sm">{{ r.avg_rating }}/10</span>
+    {% endif %}
+  </li>
+  {% else %}
+  <li class="text-gray-400">No results found. Try adjusting your search or <a href="{{ url_for('search') }}"
+      class="text-blue-500 hover:underline">start over</a>.</li>
+  {% endfor %}
+</ul>
+
+<!-- Pagination (optional) -->
+<div class="pagination flex justify-between mt-4">
+  {% if results.has_prev %}
+  <a href="{{ url_for('search', page=results.prev_num) }}" class="text-blue-500">Previous</a>
+  {% endif %}
+  {% if results.has_next %}
+  <a href="{{ url_for('search', page=results.next_num) }}" class="text-blue-500">Next</a>
+  {% endif %}
+</div>
+{% endblock %}
