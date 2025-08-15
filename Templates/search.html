@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Search Results</h1>
+<p class="muted">
+  Query: <strong>{{ q or '—' }}</strong> | Author: <strong>{{ author or '—' }}</strong> | Subject: <strong>{{ subject or '—' }}</strong> | Sort: <strong>{{ sort or '—' }}</strong>
+</p>
+<ul class="list">
+  {% for r in results %}
+    <li>
+      <a href="{{ url_for('resource_detail', resource_id=r.id) }}">📄 {{ r.title }}</a>
+      <span class="muted"> by {{ r.author or '—' }} | {{ r.subject or '—' }}</span>
+      {% if r.avg_rating %}<span class="badge">{{ r.avg_rating }}/10</span>{% endif %}
+    </li>
+  {% else %}
+    <li class="muted">No results.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
