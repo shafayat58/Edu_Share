@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EduShare</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script defer src="{{ url_for('static', filename='js/stars.js') }}"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="{{ url_for('dashboard') }}" class="brand">EduShare</a>
+    {% if current_user.is_authenticated %}
+      <form action="{{ url_for('search') }}" method="get" class="searchbar">
+        <input type="text" name="q" placeholder="Search title..." value="{{ request.args.get('q','') }}">
+        <input type="text" name="author" placeholder="Author" value="{{ request.args.get('author','') }}">
+        <input type="text" name="subject" placeholder="Subject" value="{{ request.args.get('subject','') }}">
+        <select name="sort">
+          <option value="">Sort</option>
+          <option value="rating" {% if request.args.get('sort')=='rating' %}selected{% endif %}>Top rated</option>
+        </select>
+        <button type="submit">Search</button>
+      </form>
+      <div class="spacer"></div>
+      <span class="username">Hi, {{ current_user.username }}</span>
+      <a class="btn" href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+      <div class="spacer"></div>
+      <a class="btn" href="{{ url_for('login') }}">Login</a>
+      <a class="btn" href="{{ url_for('register') }}">Register</a>
+    {% endif %}
+  </nav>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash">
+        {% for cat, msg in messages %}
+          <li class="{{ cat }}">{{ msg }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
