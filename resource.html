@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<article class="card">
+  <h1>{{ res.title }}</h1>
+  <p class="muted">
+    Subject: <strong>{{ res.subject or '—' }}</strong> |
+    Author: <strong>{{ res.author or '—' }}</strong> |
+    Uploaded: {{ res.uploaded_at.strftime('%Y-%m-%d %H:%M') }}
+  </p>
+  <p>{{ res.description or '' }}</p>
+  <p>
+    <a class="btn" href="{{ url_for('download', resource_id=res.id) }}">Download</a>
+    {% if res.uploader_id == current_user.id %}
+      <form action="{{ url_for('resource_delete', resource_id=res.id) }}" method="post" style="display:inline">
+        <button class="danger" onclick="return confirm('Delete this file?')">Delete</button>
+      </form>
+    {% endif %}
+  </p>
+</article>
+
+<section class="card">
+  <h2>Rate this resource</h2>
+  <form method="post" action="{{ url_for('submit_review', resource_id=res.id) }}">
+    <div class="stars" data-initial="{{ (res.avg_rating or 0)|int }}"></div>
+    <input type="hidden" name="rating" id="rating-input" value="">
+    <label>Comment (optional)
+      <textarea name="comment" rows="3"></textarea>
+    </label>
+    <button type="submit">Submit Review</button>
+  </form>
+  <p class="muted">Average rating: {{ res.avg_rating or '—' }}/10</p>
+  <ul class="list">
+    {% for rev in res.reviews|sort(attribute='created_at', reverse=true) %}
+      <li><strong>{{ rev.rating }}/10</strong> — {{ rev.comment or '' }} <span class="muted">by {{ rev.reviewer.username }} on {{ rev.created_at.strftime('%Y-%m-%d') }}</span></li>
+    {% else %}
+      <li class="muted">No reviews yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
